@@ -301,47 +301,9 @@
         }
       }
     },
-    "src/Contract.sol": {
-      "lastModificationDate": 1658172989079,
-      "contentHash": "0a4db02f64172ef6ba21d89f49444a92",
-      "sourceName": "src/Contract.sol",
-      "solcConfig": {
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "metadata": {
-            "bytecodeHash": "ipfs"
-          },
-          "outputSelection": {
-            "*": {
-              "": [
-                "ast"
-              ],
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ]
-            }
-          },
-          "evmVersion": "london",
-          "libraries": {}
-        }
-      },
-      "imports": [],
-      "versionRequirement": "^0.8.13",
-      "artifacts": {
-        "Contract": {
-          "0.8.13+commit.abaa5c0e.Linux.gcc": "Contract.sol/Contract.json"
-        }
-      }
-    },
     "src/Deposit.sol": {
-      "lastModificationDate": 1658190913525,
-      "contentHash": "cbf572270a651ad57a80d303bb84eae8",
+      "lastModificationDate": 1658268627522,
+      "contentHash": "1de78af09dfcf5cfc8d50eacf2ca5ce2",
       "sourceName": "src/Deposit.sol",
       "solcConfig": {
         "settings": {
@@ -377,54 +339,9 @@
         }
       }
     },
-    "test/Contract.t.sol": {
-      "lastModificationDate": 1658172989079,
-      "contentHash": "848ba83feec29a2e4d286c118102ae20",
-      "sourceName": "test/Contract.t.sol",
-      "solcConfig": {
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "metadata": {
-            "bytecodeHash": "ipfs"
-          },
-          "outputSelection": {
-            "*": {
-              "": [
-                "ast"
-              ],
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ]
-            }
-          },
-          "evmVersion": "london",
-          "libraries": {}
-        }
-      },
-      "imports": [
-        "lib/forge-std/lib/ds-test/src/test.sol",
-        "lib/forge-std/src/Script.sol",
-        "lib/forge-std/src/Test.sol",
-        "lib/forge-std/src/Vm.sol",
-        "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol"
-      ],
-      "versionRequirement": "^0.8.13",
-      "artifacts": {
-        "ContractTest": {
-          "0.8.13+commit.abaa5c0e.Linux.gcc": "Contract.t.sol/ContractTest.json"
-        }
-      }
-    },
     "test/Deposit.t.sol": {
-      "lastModificationDate": 1658192846572,
-      "contentHash": "f4df63246d9c6108cbde6e9e9f0a2ac3",
+      "lastModificationDate": 1658268684463,
+      "contentHash": "37f2931aaeff23f85f3ea58a5825129b",
       "sourceName": "test/Deposit.t.sol",
       "solcConfig": {
         "settings": {

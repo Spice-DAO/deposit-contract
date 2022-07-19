@@ -4,7 +4,6 @@ pragma solidity ^0.8.13;
 import "../src/Deposit.sol";
 import "forge-std/Test.sol";
 
-
 interface CheatCodes {
     function prank(address, address) external;
 
@@ -19,10 +18,8 @@ interface CheatCodes {
     // Sets an address' balance
 }
 
-
 contract DepositTest is Test {
     CheatCodes cheats = CheatCodes(HEVM_ADDRESS);
-
     Deposit deposit;
 
     function setUp() public {
@@ -33,17 +30,20 @@ contract DepositTest is Test {
     function testValid1() public {
         cheats.deal(address(1), 5 ether);
         cheats.prank(address(1));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.1 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.1 ether
+        }("");
         assertTrue((sent));
         assertEq(deposit.accessMapping(address(1)), 1);
-                assertFalse(deposit.isWhitelisted());
-
+        assertFalse(deposit.isWhitelisted());
     }
 
     function testValid2() public {
         cheats.deal(address(2), 5 ether);
         cheats.prank(address(2));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.2 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.2 ether
+        }("");
         assertTrue((sent));
         assertEq(deposit.accessMapping(address(2)), 2);
         assertFalse(deposit.isWhitelisted());
@@ -53,27 +53,31 @@ contract DepositTest is Test {
     function testValid3() public {
         cheats.deal(address(3), 5 ether);
         cheats.prank(address(3));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.3 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.3 ether
+        }("");
         assertTrue(sent);
         assertEq(deposit.accessMapping(address(3)), 3);
         assertFalse(deposit.isWhitelisted());
-
     }
 
     function testValid4() public {
         cheats.deal(address(4), 5 ether);
         cheats.prank(address(4));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.4 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.4 ether
+        }("");
         assertTrue(sent);
         assertEq(deposit.accessMapping(address(4)), 4);
         assertFalse(deposit.isWhitelisted());
-
     }
 
     function testValid5() public {
         cheats.deal(address(5), 5 ether);
         cheats.prank(address(5));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.5 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.5 ether
+        }("");
         assertTrue(sent);
         assertEq(deposit.accessMapping(address(5)), 5);
         assertFalse(deposit.isWhitelisted());
@@ -84,7 +88,9 @@ contract DepositTest is Test {
     function testValid6() public {
         cheats.deal(address(5), 5 ether);
         cheats.prank(address(5));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.3 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.3 ether
+        }("");
         assertTrue(sent);
         assertEq(deposit.accessMapping(address(5)), 3);
         assertFalse(deposit.isWhitelisted());
@@ -95,14 +101,18 @@ contract DepositTest is Test {
     function testFail1() public {
         cheats.deal(address(1), 5 ether);
         cheats.prank(address(1));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.9 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.9 ether
+        }("");
         require(sent, "Failed to send Ether");
     }
 
     function testFail2() public {
         cheats.deal(address(2), 5 ether);
         cheats.prank(address(2));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.5 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.5 ether
+        }("");
         require(sent, "Failed to send Ether");
     }
 
@@ -115,7 +125,6 @@ contract DepositTest is Test {
         cheats.prank(address(1));
         deposit.transferBalance();
     }
-
 
     function testCashOut() public {
         cheats.deal(address(1), 5 ether);
@@ -135,5 +144,71 @@ contract DepositTest is Test {
         assertEq(address(777).balance, 0.6 ether);
     }
 
+    // function testFailNewWhitelist() public {
+    //     address[] memory a = new address[](2);
+    //     a[0] = address(6);
+    //     a[1] = address(7);
+
+    //     deposit.updateWhitelist(a);
+    //     assertEq(
+    //         deposit.getWhitelist()[deposit.getWhitelist().length],
+    //         address(7)
+    //     );
+    // }
+
+    // function testNewWhitelist() public {
+    //     address[] memory a = new address[](2);
+    //     a[0] = address(6);
+    //     a[1] = address(7);
+
+    //     cheats.prank(address(777));
+    //     deposit.updateWhitelist(a);
+    //     //emit log_uint(deposit.getWhitelist().length);
+    //     assertEq(deposit.getWhitelist()[6], address(7));
+    // }
+
+    // function testNewClaimedDepositAmount() public {
+    //     uint256[] memory b = new uint256[](2);
+    //     b[0] = 0.4 ether;
+    //     b[1] = 0.5 ether;
+
+    //     cheats.prank(address(777));
+    //     deposit.updateClaimedDepositAmount(b);
+    //     //emit log_uint(deposit.getClaimedDepositList().length);
+    //     assertEq(deposit.getClaimedDepositList()[6], 0.5 ether);
+    // }
+
+    function testListUpdater() public {
+        address[] memory a = new address[](2);
+        a[0] = address(6);
+        a[1] = address(7);
+
+        uint[] memory b = new uint[](2);
+        b[0] = 0.4 ether;
+        b[1] = 0.5 ether;
+
+        cheats.prank(address(777));
+        deposit.updateLists(a, b);
+        assertEq(deposit.getWhitelist()[6], address(7));
+        assertEq(deposit.getClaimedDepositList()[6], 0.5 ether);
+
+        //emit log_uint(deposit);
+    }
+
+    function testFailListUpdater() public {
+        address[] memory a = new address[](1);
+        a[0] = address(6);
+
+        uint[] memory b = new uint[](2);
+        b[0] = 0.4 ether;
+        b[1] = 0.5 ether;
+
+        cheats.prank(address(777));
+        deposit.updateLists(a, b);
+        //assertEq(deposit.getWhitelist()[6], address(7));
+        //assertEq(deposit.getClaimedDepositList()[6], 0.5 ether);
+
+        //emit log_uint(deposit);
+    }
 
 }
