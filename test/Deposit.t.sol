@@ -34,21 +34,24 @@ contract DepositTest is Test {
         cheats.deal(address(1), 5 ether);
         cheats.prank(address(1));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.1 ether}("");
-        //assertEq(deposit == msg.sender);
+        uint i = deposit.accessMapping(address(1));
+        assertEq(i, 1);
     }
 
     function testValid2() public {
-        cheats.deal(address(1), 5 ether);
-        cheats.prank(address(1));
+        cheats.deal(address(2), 5 ether);
+        cheats.prank(address(2));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.2 ether}("");
+        uint i = deposit.accessMapping(address(2));
+        assertEq(i, 2);
         //assertEq(deposit == msg.sender);
     }
 
     function testValid3() public {
-        cheats.deal(address(1), 5 ether);
-        cheats.prank(address(1));
+        cheats.deal(address(3), 5 ether);
+        cheats.prank(address(3));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.3 ether}("");
-        //assertEq(deposit == msg.sender);
+        assertEq(sent, true);
     }
 
     function testValid4() public {

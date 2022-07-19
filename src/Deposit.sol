@@ -7,8 +7,8 @@ contract Deposit {
 
     address[] public depositList;
     mapping(address => uint) public addressToMintCount;
-    address[] public whitelist = [address(1)];
-    uint256[] public claimedDepositAmount = [0.3 ether];
+    address[] public whitelist = [address(1), address(2), address(3), address(4), address(5)];
+    uint256[] public claimedDepositAmount = [0.3 ether, 0.5 ether, 0.5 ether, 0.5 ether, 0.5 ether];
 
     constructor() {
         owner = msg.sender;
@@ -30,6 +30,7 @@ contract Deposit {
         require(valid, "Invalid contribution amount!");
         depositList.push(msg.sender);
         addressToMintCount[msg.sender] = count;
+        delete whitelist[getIndex()];
 
     }
 
@@ -95,6 +96,10 @@ contract Deposit {
                 return i;
             }
         }
+    }
+
+    function accessMapping(address a) public view returns(uint){
+        return addressToMintCount[a];
     }
 
 
