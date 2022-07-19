@@ -8,7 +8,7 @@ contract Deposit {
     address[] public depositList;
     mapping(address => uint) public addressToMintCount;
     address[] public whitelist = [address(1), address(2), address(3), address(4), address(5)];
-    uint256[] public claimedDepositAmount = [0.3 ether, 0.5 ether, 0.5 ether, 0.5 ether, 0.5 ether];
+    uint256[] public claimedDepositAmount = [0.1 ether, 0.2 ether, 0.3 ether, 0.4 ether, 0.5 ether];
 
     constructor() {
         owner = msg.sender;

@@ -34,16 +34,16 @@ contract DepositTest is Test {
         cheats.deal(address(1), 5 ether);
         cheats.prank(address(1));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.1 ether}("");
-        uint i = deposit.accessMapping(address(1));
-        assertEq(i, 1);
+        assertTrue((sent));
+        assertEq(deposit.accessMapping(address(1)), 1);
     }
 
     function testValid2() public {
         cheats.deal(address(2), 5 ether);
         cheats.prank(address(2));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.2 ether}("");
-        uint i = deposit.accessMapping(address(2));
-        assertEq(i, 2);
+        assertTrue((sent));
+        assertEq(deposit.accessMapping(address(2)), 2);
         //assertEq(deposit == msg.sender);
     }
 
@@ -51,27 +51,47 @@ contract DepositTest is Test {
         cheats.deal(address(3), 5 ether);
         cheats.prank(address(3));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.3 ether}("");
-        assertEq(sent, true);
+        assertTrue(sent);
+        assertEq(deposit.accessMapping(address(3)), 3);
     }
 
     function testValid4() public {
-        cheats.deal(address(1), 5 ether);
-        cheats.prank(address(1));
+        cheats.deal(address(4), 5 ether);
+        cheats.prank(address(4));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.4 ether}("");
-        //assertEq(deposit == msg.sender);
+        assertTrue(sent);
+        assertEq(deposit.accessMapping(address(4)), 4);
     }
 
     function testValid5() public {
-        cheats.deal(address(1), 5 ether);
-        cheats.prank(address(1));
+        cheats.deal(address(5), 5 ether);
+        cheats.prank(address(5));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.5 ether}("");
+        assertTrue(sent);
+        assertEq(deposit.accessMapping(address(5)), 5);
+        //assertEq(deposit == msg.sender);
+    }
+
+    function testValid6() public {
+        cheats.deal(address(5), 5 ether);
+        cheats.prank(address(5));
+        (bool sent, bytes memory data) = address(deposit).call{value: 0.3 ether}("");
+        assertTrue(sent);
+        assertEq(deposit.accessMapping(address(5)), 3);
         //assertEq(deposit == msg.sender);
     }
 
     function testFail1() public {
         cheats.deal(address(1), 5 ether);
         cheats.prank(address(1));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.12 ether}("");
+        (bool sent, bytes memory data) = address(deposit).call{value: 0.9 ether}("");
+        require(sent, "Failed to send Ether");
+    }
+
+    function testFail2() public {
+        cheats.deal(address(2), 5 ether);
+        cheats.prank(address(2));
+        (bool sent, bytes memory data) = address(deposit).call{value: 0.5 ether}("");
         require(sent, "Failed to send Ether");
     }
 
@@ -89,11 +109,19 @@ contract DepositTest is Test {
     function testCashOut() public {
         cheats.deal(address(1), 5 ether);
         cheats.prank(address(1));
-        (bool sent, bytes memory data) = address(deposit).call{value: 0.2 ether}("");
+        address(deposit).call{value: 0.1 ether}("");
+
+        cheats.deal(address(2), 5 ether);
+        cheats.prank(address(2));
+        address(deposit).call{value: 0.2 ether}("");
+
+        cheats.deal(address(3), 5 ether);
+        cheats.prank(address(3));
+        address(deposit).call{value: 0.3 ether}("");
 
         cheats.prank(address(777));
         deposit.transferBalance();
-        assertEq(address(777).balance, 0.2 ether);
+        assertEq(address(777).balance, 0.6 ether);
     }
 
 
