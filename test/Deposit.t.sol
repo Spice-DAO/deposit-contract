@@ -62,6 +62,7 @@ contract DepositTest is Test {
         cheats.deal(address(1), 5 ether);
         cheats.prank(address(1));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.2 ether}("");
+
         cheats.prank(address(777));
         deposit.transferBalance();
         assertEq(address(777).balance, 0.2 ether);

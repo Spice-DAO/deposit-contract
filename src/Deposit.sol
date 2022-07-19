@@ -15,14 +15,14 @@ contract Deposit {
     }
 
     //Might be able to remove, Should make cheaper to run
-    receive() external payable {
-        require(isWhitelisted(), "Not on whitelist!");
-        (bool valid, uint count) = getValidDeposit(msg.value);
-        require(valid, "Invalid contribution amount!");
-        depositList.push(msg.sender);
-        addressToMintCount[msg.sender] = count;
+    // receive() external payable {
+    //     require(isWhitelisted(), "Not on whitelist!");
+    //     (bool valid, uint count) = getValidDeposit(msg.value);
+    //     require(valid, "Invalid contribution amount!");
+    //     depositList.push(msg.sender);
+    //     addressToMintCount[msg.sender] = count;
         
-    }
+    // }
 
     fallback() external payable {
         require(isWhitelisted(), "Not on whitelist!");
