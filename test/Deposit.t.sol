@@ -5,7 +5,6 @@ import "../src/Deposit.sol";
 import "forge-std/Test.sol";
 
 
-
 interface CheatCodes {
     function prank(address, address) external;
 
@@ -29,14 +28,40 @@ contract DepositTest is Test {
     function setUp() public {
         cheats.prank(address(777));
         deposit = new Deposit();
-
-        
     }
 
     function testValid1() public {
         cheats.deal(address(1), 5 ether);
         cheats.prank(address(1));
         (bool sent, bytes memory data) = address(deposit).call{value: 0.1 ether}("");
+        //assertEq(deposit == msg.sender);
+    }
+
+    function testValid2() public {
+        cheats.deal(address(1), 5 ether);
+        cheats.prank(address(1));
+        (bool sent, bytes memory data) = address(deposit).call{value: 0.2 ether}("");
+        //assertEq(deposit == msg.sender);
+    }
+
+    function testValid3() public {
+        cheats.deal(address(1), 5 ether);
+        cheats.prank(address(1));
+        (bool sent, bytes memory data) = address(deposit).call{value: 0.3 ether}("");
+        //assertEq(deposit == msg.sender);
+    }
+
+    function testValid4() public {
+        cheats.deal(address(1), 5 ether);
+        cheats.prank(address(1));
+        (bool sent, bytes memory data) = address(deposit).call{value: 0.4 ether}("");
+        //assertEq(deposit == msg.sender);
+    }
+
+    function testValid5() public {
+        cheats.deal(address(1), 5 ether);
+        cheats.prank(address(1));
+        (bool sent, bytes memory data) = address(deposit).call{value: 0.5 ether}("");
         //assertEq(deposit == msg.sender);
     }
 
