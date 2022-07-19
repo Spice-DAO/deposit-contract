@@ -5,10 +5,10 @@ contract Deposit {
     bool public active = true;
     address owner;
 
-    address[] public depositlist;
     mapping(address => uint256) public addressToMintCount;
     mapping(address => uint256) public addressToDeposit;
 
+    address[] public depositlist;
     address[] public whitelist = [
         address(1),
         address(2),
@@ -16,7 +16,8 @@ contract Deposit {
         address(4),
         address(5)
     ];
-    uint256[] public claimedDepositAmount = [
+
+    uint256[] public claimedDeposit = [
         0.1 ether,
         0.2 ether,
         0.3 ether,
@@ -24,19 +25,12 @@ contract Deposit {
         0.5 ether
     ];
 
+
+
     constructor() {
         owner = msg.sender;
     }
 
-    //Might be able to remove, Should make cheaper to run
-    // receive() external payable {
-    //     require(isWhitelisted(), "Not on whitelist!");
-    //     (bool valid, uint count) = getValidDeposit(msg.value);
-    //     require(valid, "Invalid contribution amount!");
-    //     depositlist.push(msg.sender);
-    //     addressToMintCount[msg.sender] = count;
-
-    // }
 
     fallback() external payable {
         require(active, "Deposit Contract Inactive!");
@@ -64,14 +58,15 @@ contract Deposit {
     function redeem() public noReentrant {
         require(active, "Deposit Contract Inactive!");
         require(isWhitelisted(), "Not Whitelisted!");
-        require(isDepositlisted(), "Not Deposit Listed!");
+        require(isDepositlisted(), "Not On Deposit List!");
         require(
             address(this).balance > 0,
             "Out of Funding! Please Notify Team!"
         );
         (bool sent, bytes memory data) = address(msg.sender).call{value: addressToDeposit[msg.sender]}("");
-
     }
+
+
 
     /// @notice Gets message senders whitelist status.
     /// @return funder True if on Deposit whitelist, False if not on Deposit whitelist
@@ -95,15 +90,19 @@ contract Deposit {
         return false;
     }
 
-    function updateLists(address[] memory newWhitelist, uint[] memory newClaimedDepositAmount) public onlyOwner{
-        require(newWhitelist.length == newClaimedDepositAmount.length, "Lists Not Same Length! PLEASE CHECK");
+
+    /// @notice Updates whitelist and claimed deposit amount list
+    /// @dev Ensure same order as newClaimedBurnAmount and same number of entries AND are in the same order
+    /// @param newWhitelist The new whitelist for another campaign
+    /// @param newclaimedDeposit The new Claimed Deposit Amount for another group of users
+    function updateLists(address[] memory newWhitelist, uint[] memory newclaimedDeposit) public onlyOwner{
+        require(newWhitelist.length == newclaimedDeposit.length, "Lists Not Same Length! PLEASE CHECK");
         updateWhitelist(newWhitelist);
-        updateClaimedDepositAmount(newClaimedDepositAmount);
+        updateclaimedDeposit(newclaimedDeposit);
     }
 
 
     /// @notice Updates whitelist for future campaigns
-    /// @dev Ensure same order as newClaimedBurnAmount and same number of entries
     /// @param newWhitelist The new whitelist for another campaign
     function updateWhitelist(address[] memory newWhitelist) internal onlyOwner{
         address[] memory returnArr = new address[](
@@ -124,36 +123,25 @@ contract Deposit {
     }
 
     /// @notice Updates Claimed Deposit Amount for new whitelisted users.
-    /// @dev Ensure same order as newClaimedBurnAmount and same number of entries
-    /// @param newClaimedDepositAmount The new Claimed Deposit Amount for another group of users
-    function updateClaimedDepositAmount(uint[] memory newClaimedDepositAmount) internal onlyOwner {
+    /// @param newclaimedDeposit The new Claimed Deposit Amount for another group of users
+    function updateclaimedDeposit(uint[] memory newclaimedDeposit) internal onlyOwner {
         uint[] memory returnArr = new uint[](
-            claimedDepositAmount.length + newClaimedDepositAmount.length
+            claimedDeposit.length + newclaimedDeposit.length
         );
 
         uint256 i = 0;
-        for (i; i < claimedDepositAmount.length; i++) {
-            returnArr[i] = claimedDepositAmount[i];
+        for (i; i < claimedDeposit.length; i++) {
+            returnArr[i] = claimedDeposit[i];
         }
 
         uint256 j = 0;
-        while (j < newClaimedDepositAmount.length) {
-            returnArr[i++] = newClaimedDepositAmount[j++];
+        while (j < newclaimedDeposit.length) {
+            returnArr[i++] = newclaimedDeposit[j++];
         }
 
-        claimedDepositAmount = returnArr;
+        claimedDeposit = returnArr;
     }
 
-
-    /////FOR TESTING
-
-    function getWhitelistLength() public view returns(uint){
-        return whitelist.length;
-    }
-
-    function getClaimedDepositAmountLength() public view returns(uint){
-        return claimedDepositAmount.length;
-    }
 
 
     function getWhitelist() public view returns (address[] memory a) {
@@ -161,8 +149,18 @@ contract Deposit {
     }
 
     function getClaimedDepositList() public view returns (uint[] memory a) {
-        return claimedDepositAmount;
+        return claimedDeposit;
     }
+
+    function getCountMapping(address a) public view returns (uint256) {
+        return addressToMintCount[a];
+    }
+
+    function getDepositMapping(address a) public view returns (uint256) {
+        require(isDepositlisted(), "Not A Depositor!");
+        return addressToDeposit[a];
+    }
+
 
 
     /// @notice Used to toggle a campaigns active state, will return false if true, true if false
@@ -181,9 +179,6 @@ contract Deposit {
         }
     }
 
-    function accessMapping(address a) public view returns (uint256) {
-        return addressToMintCount[a];
-    }
 
     function transferBalance() public onlyOwner {
         (bool sent, ) = payable(owner).call{value: address(this).balance}("");
@@ -196,7 +191,7 @@ contract Deposit {
         returns (bool valid, uint256 count)
     {
         require(
-            val <= claimedDepositAmount[getIndex()],
+            val <= claimedDeposit[getIndex()],
             "Contribution greater than Claimed Deposit Amount!"
         );
         for (uint256 i = 0; i < 5; i++) {

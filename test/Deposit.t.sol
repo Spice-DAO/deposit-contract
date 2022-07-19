@@ -34,7 +34,9 @@ contract DepositTest is Test {
             value: 0.1 ether
         }("");
         assertTrue((sent));
-        assertEq(deposit.accessMapping(address(1)), 1);
+        assertEq(deposit.getCountMapping(address(1)), 1);
+        cheats.prank(address(1));
+        assertEq(deposit.getDepositMapping(address(1)), 0.1 ether);
         assertFalse(deposit.isWhitelisted());
     }
 
@@ -45,7 +47,9 @@ contract DepositTest is Test {
             value: 0.2 ether
         }("");
         assertTrue((sent));
-        assertEq(deposit.accessMapping(address(2)), 2);
+        assertEq(deposit.getCountMapping(address(2)), 2);
+        cheats.prank(address(2));
+        assertEq(deposit.getDepositMapping(address(2)), 0.2 ether);
         assertFalse(deposit.isWhitelisted());
         //assertEq(deposit == msg.sender);
     }
@@ -56,8 +60,10 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{
             value: 0.3 ether
         }("");
-        assertTrue(sent);
-        assertEq(deposit.accessMapping(address(3)), 3);
+        assertTrue((sent));
+        assertEq(deposit.getCountMapping(address(3)), 3);
+        cheats.prank(address(3));
+        assertEq(deposit.getDepositMapping(address(3)), 0.3 ether);
         assertFalse(deposit.isWhitelisted());
     }
 
@@ -67,8 +73,10 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{
             value: 0.4 ether
         }("");
-        assertTrue(sent);
-        assertEq(deposit.accessMapping(address(4)), 4);
+        assertTrue((sent));
+        assertEq(deposit.getCountMapping(address(4)), 4);
+        cheats.prank(address(4));
+        assertEq(deposit.getDepositMapping(address(4)), 0.4 ether);
         assertFalse(deposit.isWhitelisted());
     }
 
@@ -78,10 +86,11 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{
             value: 0.5 ether
         }("");
-        assertTrue(sent);
-        assertEq(deposit.accessMapping(address(5)), 5);
+        assertTrue((sent));
+        assertEq(deposit.getCountMapping(address(5)), 5);
+        cheats.prank(address(5));
+        assertEq(deposit.getDepositMapping(address(5)), 0.5 ether);
         assertFalse(deposit.isWhitelisted());
-
         //assertEq(deposit == msg.sender);
     }
 
@@ -91,11 +100,11 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{
             value: 0.3 ether
         }("");
-        assertTrue(sent);
-        assertEq(deposit.accessMapping(address(5)), 3);
+        assertTrue((sent));
+        assertEq(deposit.getCountMapping(address(5)), 3);
+        cheats.prank(address(5));
+        assertEq(deposit.getDepositMapping(address(5)), 0.3 ether);
         assertFalse(deposit.isWhitelisted());
-
-        //assertEq(deposit == msg.sender);
     }
 
     function testFail1() public {
@@ -114,6 +123,23 @@ contract DepositTest is Test {
             value: 0.5 ether
         }("");
         require(sent, "Failed to send Ether");
+    }
+
+    function testFail3() public {
+        cheats.deal(address(3), 5 ether);
+        cheats.prank(address(3));
+        (bool sent, bytes memory data) = address(deposit).call{
+            value: 0.3 ether
+        }("");
+        //assertTrue((sent));
+        //assertEq(deposit.getCountMapping(address(3)), 3);
+        //assertEq(deposit.getDepositMapping(address(3)), 0.3 ether);
+        //assertFalse(deposit.isWhitelisted());
+
+        cheats.deal(address(3), 5 ether);
+        cheats.prank(address(3));
+        address(deposit).call{value: 0.3 ether}("");
+        vm.expectRevert("Not on whitelist!");
     }
 
     function testFailToggle() public {
@@ -183,7 +209,7 @@ contract DepositTest is Test {
         a[0] = address(6);
         a[1] = address(7);
 
-        uint[] memory b = new uint[](2);
+        uint256[] memory b = new uint256[](2);
         b[0] = 0.4 ether;
         b[1] = 0.5 ether;
 
@@ -199,7 +225,7 @@ contract DepositTest is Test {
         address[] memory a = new address[](1);
         a[0] = address(6);
 
-        uint[] memory b = new uint[](2);
+        uint256[] memory b = new uint256[](2);
         b[0] = 0.4 ether;
         b[1] = 0.5 ether;
 
@@ -210,5 +236,4 @@ contract DepositTest is Test {
 
         //emit log_uint(deposit);
     }
-
 }
