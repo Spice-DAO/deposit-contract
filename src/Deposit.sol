@@ -6,19 +6,31 @@ contract Deposit {
     address owner;
 
     address[] public depositList;
+    mapping(address => uint) public addressToMintCount;
     address[] public whitelist = [address(1)];
-    uint256[] public claimedDepositAmount = [0.5 ether];
+    uint256[] public claimedDepositAmount = [0.3 ether];
 
     constructor() {
         owner = msg.sender;
     }
 
+    //Might be able to remove, Should make cheaper to run
     receive() external payable {
         require(isWhitelisted(), "Not on whitelist!");
+        (bool valid, uint count) = getValidDeposit(msg.value);
+        require(valid, "Invalid contribution amount!");
+        depositList.push(msg.sender);
+        addressToMintCount[msg.sender] = count;
+        
     }
 
     fallback() external payable {
         require(isWhitelisted(), "Not on whitelist!");
+        (bool valid, uint count) = getValidDeposit(msg.value);
+        require(valid, "Invalid contribution amount!");
+        depositList.push(msg.sender);
+        addressToMintCount[msg.sender] = count;
+
     }
 
     modifier onlyOwner() {
@@ -74,11 +86,36 @@ contract Deposit {
         active = !active;
     }
 
+    /// @notice Gets index of user in whitelist. Used also to verify claimedBurnAmount numbers.
+    /// @return index The Index of Message Sender, reverts if not whitelisted
+    function getIndex() public view returns (uint256 index) {
+        require(isWhitelisted(), "Not On Whitelist");
+        for (uint256 i = 0; i < whitelist.length; i++) {
+            if (whitelist[i] == msg.sender) {
+                return i;
+            }
+        }
+    }
+
+
 
     function transferBalance() public onlyOwner{
-        (bool sent, bytes memory data) = payable(owner).call{
+        (bool sent, ) = payable(owner).call{
             value: address(this).balance
         }("");
+        require(sent, "Failed to send Ether");
+    }
+
+    function getValidDeposit(uint val) public view returns(bool valid, uint count) {
+        require(val <= claimedDepositAmount[getIndex()], "Contribution greater than Claimed Deposit Amount!");
+        for(uint i = 0; i < 5; i++){
+        if(val == [0.1 ether, 0.2 ether, 0.3 ether, 0.4 ether, 0.5 ether][i]){
+            return(true, i+1);
+        }
+        }
+        return (false, 0);
+
+
     }
  
 }
