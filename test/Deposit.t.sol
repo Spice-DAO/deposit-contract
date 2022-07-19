@@ -36,6 +36,8 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{value: 0.1 ether}("");
         assertTrue((sent));
         assertEq(deposit.accessMapping(address(1)), 1);
+                assertFalse(deposit.isWhitelisted());
+
     }
 
     function testValid2() public {
@@ -44,6 +46,7 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{value: 0.2 ether}("");
         assertTrue((sent));
         assertEq(deposit.accessMapping(address(2)), 2);
+        assertFalse(deposit.isWhitelisted());
         //assertEq(deposit == msg.sender);
     }
 
@@ -53,6 +56,8 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{value: 0.3 ether}("");
         assertTrue(sent);
         assertEq(deposit.accessMapping(address(3)), 3);
+        assertFalse(deposit.isWhitelisted());
+
     }
 
     function testValid4() public {
@@ -61,6 +66,8 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{value: 0.4 ether}("");
         assertTrue(sent);
         assertEq(deposit.accessMapping(address(4)), 4);
+        assertFalse(deposit.isWhitelisted());
+
     }
 
     function testValid5() public {
@@ -69,6 +76,8 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{value: 0.5 ether}("");
         assertTrue(sent);
         assertEq(deposit.accessMapping(address(5)), 5);
+        assertFalse(deposit.isWhitelisted());
+
         //assertEq(deposit == msg.sender);
     }
 
@@ -78,6 +87,8 @@ contract DepositTest is Test {
         (bool sent, bytes memory data) = address(deposit).call{value: 0.3 ether}("");
         assertTrue(sent);
         assertEq(deposit.accessMapping(address(5)), 3);
+        assertFalse(deposit.isWhitelisted());
+
         //assertEq(deposit == msg.sender);
     }
 
