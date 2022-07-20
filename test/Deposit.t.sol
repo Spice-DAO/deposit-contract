@@ -149,7 +149,7 @@ contract DepositTest is Test {
 
     function testFailCashOut() public {
         cheats.prank(address(1));
-        deposit.transferBalance();
+        deposit.transferBalance(address(1));
     }
 
     function testCashOut() public {
@@ -166,7 +166,7 @@ contract DepositTest is Test {
         address(deposit).call{value: 0.3 ether}("");
 
         cheats.prank(address(777));
-        deposit.transferBalance();
+        deposit.transferBalance(address(777));
         assertEq(address(777).balance, 0.6 ether);
     }
 
