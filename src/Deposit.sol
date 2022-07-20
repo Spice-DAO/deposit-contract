@@ -59,7 +59,6 @@ contract Deposit {
     /// @notice Users can get refunds from this contract
     function refund() public noReentrant {
         require(active, "Deposit Contract Inactive");
-        require(isWhitelisted(), "Not On Whitelist");
         require(isDepositlisted(), "Not On Deposit List");
         require(
             address(this).balance > 0,
@@ -69,6 +68,8 @@ contract Deposit {
             value: addressToDeposit[msg.sender]
         }("");
         require(sent, "Failed to send Ether");
+        delete depositlist[getIndex()];
+
     }
 
     /// @param to the address that will receive the balance
@@ -82,7 +83,7 @@ contract Deposit {
     function activeToggle() public onlyOwner {
         active = !active;
     }
-    
+
     /// @notice Used to return deposit list
     function getDepositList() public view onlyOwner returns (address[] memory) {
         return depositlist;
