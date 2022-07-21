@@ -7,11 +7,11 @@ contract Deposit {
     bool internal locked;
     bool public active = true;
     address owner;
-
     mapping(address => uint256) public addressToMintCount;
     mapping(address => uint256) public addressToDeposit;
-
+    address[] public refundlist;
     address[] public depositlist;
+
     address[] public whitelist = [
         address(1),
         address(2),
@@ -47,13 +47,14 @@ contract Deposit {
     /// @notice Called when eth is provided.
     fallback() external payable {
         require(active, "Deposit Contract Inactive");
+        require(!isRefundlisted(), "Already Refunded");
         require(isWhitelisted(), "Not On Whitelist");
         (bool valid, uint256 count) = getValidDeposit(msg.value);
         require(valid, "Invalid Contribution Amount");
         depositlist.push(msg.sender);
         addressToMintCount[msg.sender] = count;
         addressToDeposit[msg.sender] = msg.value;
-        delete whitelist[getIndex()];
+        delete whitelist[getWhitelistIndex()];
     }
 
     /// @notice Users can get refunds from this contract
@@ -68,8 +69,8 @@ contract Deposit {
             value: addressToDeposit[msg.sender]
         }("");
         require(sent, "Failed to send Ether");
-        delete depositlist[getIndex()];
-
+        delete depositlist[getDepositlistIndex()];
+        refundlist.push(msg.sender);
     }
 
     /// @param to the address that will receive the balance
@@ -114,8 +115,8 @@ contract Deposit {
 
     /// @notice Gets index of user in whitelist. Used also to verify claimedBurnAmount numbers.
     /// @return index The Index of Message Sender, reverts if not whitelisted
-    function getIndex() public view returns (uint256 index) {
-        require(isWhitelisted(), "Not On Whitelist");
+    function getWhitelistIndex() public view returns (uint256 index) {
+        //require(isWhitelisted(), "Not On Whitelist");
         for (uint256 i = 0; i < whitelist.length; i++) {
             if (whitelist[i] == msg.sender) {
                 return i;
@@ -123,9 +124,20 @@ contract Deposit {
         }
     }
 
+    /// @notice Gets index of user in whitelist. Used also to verify claimedBurnAmount numbers.
+    /// @return index The Index of Message Sender, reverts if not whitelisted
+    function getDepositlistIndex() public view returns (uint256 index) {
+        //require(isW(), "Not On Whitelist");
+        for (uint256 i = 0; i < depositlist.length; i++) {
+            if (depositlist[i] == msg.sender) {
+                return i;
+            }
+        }
+    }
+
     /// @notice Gets message senders whitelist status.
-    /// @return funder True if on Deposit whitelist, False if not on Deposit whitelist
-    function isWhitelisted() public view returns (bool funder) {
+    /// @return whitelisted True if on Deposit whitelist, False if not on Deposit whitelist
+    function isWhitelisted() public view returns (bool whitelisted) {
         for (uint256 i = 0; i < whitelist.length; i++) {
             if (whitelist[i] == msg.sender) {
                 return true;
@@ -145,6 +157,17 @@ contract Deposit {
         return false;
     }
 
+    /// @notice Gets message senders whitelist status.
+    /// @return refunded True if on refundlistlist, False if not on Deposit whitelist
+    function isRefundlisted() public view returns (bool refunded) {
+        for (uint256 i = 0; i < refundlist.length; i++) {
+            if (refundlist[i] == msg.sender) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /// @return valid The boolean status of if the deposit is for a valid amount
     /// @return count The NFT Mint count for the user
     function getValidDeposit(uint256 val)
@@ -153,7 +176,7 @@ contract Deposit {
         returns (bool valid, uint256 count)
     {
         require(
-            val <= claimedDeposit[getIndex()],
+            val <= claimedDeposit[getWhitelistIndex()],
             "Contribution greater than Claimed Deposit Amount!"
         );
         for (uint256 i = 0; i < 5; i++) {
